@@ -20,7 +20,11 @@ class Game
     @position = gets.chomp
     @gameboard.update(@player, @position.to_i)
 
-    if @gameboard.winner?(@player)
+    if @gameboard.tie?
+      puts "\nIt's a tie! Would you like to play again? (y/n)"
+
+      gets.chomp.downcase == "y" ? Game.new : return
+    elsif @gameboard.winner?(@player)
       puts "\n#{@player} wins!"
       puts "Would you like to play again? (y/n)"
 
@@ -53,13 +57,13 @@ class Gameboard
     if @all_positions[position -1] == " "
       @moves[player].push(position)
       @moves[player].each{ |pos| @all_positions[pos.to_i   - 1] = player.to_s}
+
+      display
     else
-      puts "You can't play there, please choose again"
+      puts "\nYou can't play there, please choose again."
       new_position = gets.chomp.to_i
       update(player, new_position)
     end
-
-    display
   end
 
   def winner?(player)
@@ -67,6 +71,10 @@ class Gameboard
     win = false
     @winners.each { |w| win = true if (w - @moves[player.upcase.to_sym]).empty?}
     return win
+  end
+
+  def tie?
+    @all_positions.include?(" ") ? false : true
   end
 
   private
